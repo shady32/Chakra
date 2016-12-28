@@ -1,0 +1,12 @@
+<div class="page-group">
+	<div class="page page-current">
+		<a>accountManger</a>
+		<script>
+			(function($) {
+				$(".page").on("tap", "a", function() {
+					Zepto.router.load("index.html?m=pages_user&a=accountManger")
+				})
+			})(mui)
+		</script>
+	</div>
+</div>

@@ -326,7 +326,6 @@ function($) {
 		}
 
 		var cacheDocument = this.cache[baseUrl];
-		console.log(this.cache)
 		var context = this;
 		if(cacheDocument) {
 			setTimeout(function() {
@@ -437,37 +436,32 @@ function($) {
 	Router.prototype._saveDocumentIntoCache = function(doc, url) {
 		var urlAsKey = Util.toUrlObject(url).base;
 		var $doc = $(doc);
-		//		this._extendHTML($doc);
+		this._extendHTML($doc);
 		this.cache[urlAsKey] = {
 			$doc: $doc,
 			$content: $doc.find('.' + routerConfig.sectionGroupClass)
 		};
 	};
 
-	//	Router.prototype._extendHTML = function($doc) {
-	//		var extend = $doc.find("extend");
-	//		var that = this;
-	//		extend.forEach(function(e) {
-	//			var exp = e.getAttribute("exp");
-	//			if(!$.data) {
-	//				Zepto.getUser();
-	//			}
-	//			var res = eval(exp);
-	//			if(res) {
-	//				$.ajax({
-	//					type: "get",
-	//					url: res,
-	//					async: false,
-	//					success: $.proxy(function(data, status, xhr) {
-	//						$(e).before(data);
-	//						$(e).remove();
-	//						that._extendHTML($doc)
-	//							//$.hideIndicator();
-	//					}, this)
-	//				});
-	//			}
-	//		})
-	//	}
+	Router.prototype._extendHTML = function($doc) {
+		var extend = $doc.find("extend");
+		var that = this;
+		extend.forEach(function(e) {
+			var src = $.root + "/" + e.getAttribute("src");
+			if(src) {
+				$.ajax({
+					type: "get",
+					url: src,
+					async: false,
+					success: $.proxy(function(data, status, xhr) {
+						$(e).before(data);
+						$(e).remove();
+						that._extendHTML($doc)
+					}, this)
+				});
+			}
+		})
+	}
 
 	Router.prototype._getLastState = function() {
 		var currentState = sessionStorage.getItem(this.sessionNames.currentState);

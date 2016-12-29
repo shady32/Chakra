@@ -1,6 +1,7 @@
 <div class="page-group">
 	<div class="page page-current">
 		<a>accountManger</a>
+		<extend src="module/page.ex" data=""/>
 		<script>
 			(function($) {
 				$(".page").on("tap", "a", function() {

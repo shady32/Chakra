@@ -447,17 +447,31 @@ function($) {
 		var extend = $doc.find("extend");
 		var that = this;
 		extend.forEach(function(e) {
-			var src = $.root + "/" + e.getAttribute("src");
-			if(src) {
+			var $e = $(e);
+			var ext = {};
+			try {
+				eval($e.html());
+			} catch(_e) {
+				console.error(_e);
+			}
+			if(ext && ext.src) {
+				var src = $.root + "/" + ext.src;
 				$.ajax({
 					type: "get",
 					url: src,
 					async: false,
-					success: $.proxy(function(data, status, xhr) {
-						$(e).before(data);
-						$(e).remove();
+					success: function(html) {
+						var binds = html.match(/\{\$([^\{\{]+)\}/g);
+						console.log(binds)
+						binds.forEach(function(b) {
+							var _b = b.replace("{", "").replace("}", "");
+							var content = ext.data[_b] || "";
+							html = html.replace(b, content);
+						})
+						$e.before(html);
+						$e.remove();
 						that._extendHTML($doc)
-					}, this)
+					}
 				});
 			}
 		})

@@ -22,9 +22,10 @@
 		<script type="text/javascript">
 			(function($) {
 				$.init();
-				$.data={}
+				$.data = {}
+				$.data.u = 2;
 				$(window).on("routerReady", function() {
-					Zepto.router.load(location.href,true);
+					Zepto.router.load(location.href, true);
 				});
 			})(Zepto)
 		</script>

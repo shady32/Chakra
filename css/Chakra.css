@@ -4,18 +4,12 @@
 }
 
 html {
-	font-size: 10px
-}
-
-@media screen and (min-width:321px) and (max-width:375px) {
-	html {
-		font-size: 11px
-	}
+	font-size: 12px
 }
 
 @media screen and (min-width:376px) and (max-width:414px) {
 	html {
-		font-size: 12px
+		font-size: 13px
 	}
 }
 

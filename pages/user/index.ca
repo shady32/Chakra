@@ -1,7 +1,18 @@
 <div class="page-group">
 	<div class="page page-current">
 		<a>accountManger</a>
-		<extend src="module/page.ex" data=""/>
+		<extend>
+			if($.data.u===1){
+				ext.src="module/page.ex";
+			}else{
+				ext.src="module/page2.ex";
+			}
+			ext.data={
+				$account1:111,
+				$account2:222,
+				$account3:333
+			}
+		</extend>
 		<script>
 			(function($) {
 				$(".page").on("tap", "a", function() {

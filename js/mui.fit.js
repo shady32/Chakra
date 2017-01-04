@@ -7099,7 +7099,7 @@ Function.prototype.bind = Function.prototype.bind || function(to) {
 	}());
 
 	var createInput = function(placeholder, value) {
-		return '<div class="' + CLASS_POPUP_INPUT + '"><input type="text" autofocus value="' + (value || '') + '" placeholder="' + (placeholder || '') + '"/></div>';
+		return '<div class="' + CLASS_POPUP_INPUT + '"><input type="text" value="' + (value || '') + '" placeholder="' + (placeholder || '') + '"/></div>';
 	};
 	var createInner = function(message, title, extra) {
 		return '<div class="' + CLASS_POPUP_INNER + '"><div class="' + CLASS_POPUP_TITLE + '">' + title + '</div><div class="' + CLASS_POPUP_TEXT + '">' + message.replace(/\r\n/g, "<br/>").replace(/\n/g, "<br/>") + '</div>' + (extra || '') + '</div>';
@@ -7843,24 +7843,24 @@ Function.prototype.bind = Function.prototype.bind || function(to) {
 			var self = this;
 			var val = self.input.value;
 			if(val == null || val == '' || isNaN(val)) {
-				self.input.value = self.options.min || 0;
-				self.minus.disabled = self.options.min != null;
-			} else {
-				var val = parseInt(val);
-				if(self.options.max != null && !isNaN(self.options.max) && val >= parseInt(self.options.max)) {
-					val = self.options.max;
-					self.plus.disabled = true;
-				} else {
-					self.plus.disabled = false;
-				}
-				if(self.options.min != null && !isNaN(self.options.min) && val <= parseInt(self.options.min)) {
-					val = self.options.min;
-					self.minus.disabled = true;
-				} else {
-					self.minus.disabled = false;
-				}
-				self.input.value = val;
+				val = self.input.value = self.options.min || 0;
+
+				//				self.minus.disabled = self.options.min != null;
 			}
+			var val = parseInt(val);
+			if(self.options.max != null && !isNaN(self.options.max) && val >= parseInt(self.options.max)) {
+				val = self.options.max;
+				self.plus.disabled = true;
+			} else {
+				self.plus.disabled = false;
+			}
+			if(self.options.min != null && !isNaN(self.options.min) && val <= parseInt(self.options.min)) {
+				val = self.options.min;
+				self.minus.disabled = true;
+			} else {
+				self.minus.disabled = false;
+			}
+			self.input.value = val;
 		},
 		/**
 		 * 更新选项
@@ -7957,22 +7957,22 @@ Function.prototype.bind = Function.prototype.bind || function(to) {
 			this.initEvent();
 		},
 		_preventDefaultException: function(el, exceptions) {
-			for (var i in exceptions) {
-				if (exceptions[i].test(el[i])) {
+			for(var i in exceptions) {
+				if(exceptions[i].test(el[i])) {
 					return true;
 				}
 			}
 			return false;
 		},
 		initEvent: function() {
-			if ($.isFunction(this.options.down.callback)) {
+			if($.isFunction(this.options.down.callback)) {
 				this.element.addEventListener($.EVENT_START, this);
 				this.element.addEventListener('drag', this);
 				this.element.addEventListener('dragend', this);
 			}
-			if (this.pullUpTips) {
+			if(this.pullUpTips) {
 				this.element.addEventListener('dragup', this);
-				if (this.isInScroll) {
+				if(this.isInScroll) {
 					this.element.addEventListener('scrollbottom', this);
 				} else {
 					window.addEventListener('scroll', this);
@@ -7980,7 +7980,7 @@ Function.prototype.bind = Function.prototype.bind || function(to) {
 			}
 		},
 		handleEvent: function(e) {
-			switch (e.type) {
+			switch(e.type) {
 				case $.EVENT_START:
 					this.isInScroll && this._canPullDown() && e.target && !this._preventDefaultException(e.target, this.options.preventDefaultException) && e.preventDefault();
 					break;
@@ -7998,7 +7998,7 @@ Function.prototype.bind = Function.prototype.bind || function(to) {
 					this._dragup(e);
 					break;
 				case 'scrollbottom':
-					if (e.target === this.element) {
+					if(e.target === this.element) {
 						this.pullUpLoading(e);
 					}
 					break;
@@ -8006,13 +8006,13 @@ Function.prototype.bind = Function.prototype.bind || function(to) {
 		},
 		initPullDownTips: function() {
 			var self = this;
-			if ($.isFunction(self.options.down.callback)) {
+			if($.isFunction(self.options.down.callback)) {
 				self.pullDownTips = (function() {
 					var element = document.querySelector('.' + CLASS_PULL_TOP_TIPS);
-					if (element) {
+					if(element) {
 						element.parentNode.removeChild(element);
 					}
-					if (!element) {
+					if(!element) {
 						element = document.createElement('div');
 						element.classList.add(CLASS_PULL_TOP_TIPS);
 						element.innerHTML = '<div class="mui-pull-top-wrapper"><span class="mui-pull-loading mui-icon mui-icon-pulldown"></span></div>';
@@ -8026,13 +8026,13 @@ Function.prototype.bind = Function.prototype.bind || function(to) {
 		},
 		initPullUpTips: function() {
 			var self = this;
-			if ($.isFunction(self.options.up.callback)) {
+			if($.isFunction(self.options.up.callback)) {
 				self.pullUpTips = (function() {
 					var element = self.element.querySelector('.' + CLASS_PULL_BOTTOM_TIPS);
-					if (!element) {
+					if(!element) {
 						element = document.createElement('div');
 						element.classList.add(CLASS_PULL_BOTTOM_TIPS);
-						if (!self.options.up.show) {
+						if(!self.options.up.show) {
 							element.classList.add(CLASS_HIDDEN);
 						}
 						element.innerHTML = '<div class="mui-pull-bottom-wrapper"><span class="mui-pull-loading">' + self.options.up.contentinit + '</span></div>';
@@ -8044,35 +8044,35 @@ Function.prototype.bind = Function.prototype.bind || function(to) {
 			}
 		},
 		_transitionEnd: function(e) {
-			if (e.target === this.pullDownTips && this.removing) {
+			if(e.target === this.pullDownTips && this.removing) {
 				this.removePullDownTips();
 			}
 		},
 		_dragup: function(e) {
 			var self = this;
-			if (self.loading) {
+			if(self.loading) {
 				return;
 			}
-			if (e && e.detail && $.gestures.session.drag) {
+			if(e && e.detail && $.gestures.session.drag) {
 				self.isDraggingUp = true;
 			} else {
-				if (!self.isDraggingUp) { //scroll event
+				if(!self.isDraggingUp) { //scroll event
 					return;
 				}
 			}
-			if (!self.isDragging) {
-				if (self._canPullUp()) {
+			if(!self.isDragging) {
+				if(self._canPullUp()) {
 					self.pullUpLoading(e);
 				}
 			}
 		},
 		_canPullUp: function() {
-			if (this.removing) {
+			if(this.removing) {
 				return false;
 			}
-			if (this.isInScroll) {
+			if(this.isInScroll) {
 				var scrollId = this.element.parentNode.getAttribute('data-scroll');
-				if (scrollId) {
+				if(scrollId) {
 					var scrollApi = $.data[scrollId];
 					return scrollApi.y === scrollApi.maxScrollY;
 				}
@@ -8080,12 +8080,12 @@ Function.prototype.bind = Function.prototype.bind || function(to) {
 			return window.pageYOffset + window.innerHeight + this.options.up.offset >= document.documentElement.scrollHeight;
 		},
 		_canPullDown: function() {
-			if (this.removing) {
+			if(this.removing) {
 				return false;
 			}
-			if (this.isInScroll) {
+			if(this.isInScroll) {
 				var scrollId = this.element.parentNode.getAttribute('data-scroll');
-				if (scrollId) {
+				if(scrollId) {
 					var scrollApi = $.data[scrollId];
 					return scrollApi.y === 0;
 				}
@@ -8093,15 +8093,15 @@ Function.prototype.bind = Function.prototype.bind || function(to) {
 			return document.body.scrollTop === 0;
 		},
 		_drag: function(e) {
-			if (this.loading || this.stopped) {
+			if(this.loading || this.stopped) {
 				e.stopPropagation();
 				e.detail.gesture.preventDefault();
 				return;
 			}
 			var detail = e.detail;
-			if (!this.isDragging) {
-				if (detail.direction === 'down' && this._canPullDown()) {
-					if (document.querySelector('.' + CLASS_PULL_TOP_TIPS)) {
+			if(!this.isDragging) {
+				if(detail.direction === 'down' && this._canPullDown()) {
+					if(document.querySelector('.' + CLASS_PULL_TOP_TIPS)) {
 						e.stopPropagation();
 						e.detail.gesture.preventDefault();
 						return;
@@ -8114,7 +8114,7 @@ Function.prototype.bind = Function.prototype.bind || function(to) {
 					this._pullStart(this.startDeltaY);
 				}
 			}
-			if (this.isDragging) {
+			if(this.isDragging) {
 				e.stopPropagation();
 				e.detail.gesture.preventDefault();
 				var deltaY = detail.deltaY - this.startDeltaY;
@@ -8122,9 +8122,9 @@ Function.prototype.bind = Function.prototype.bind || function(to) {
 				this.deltaY = deltaY;
 				this._pulling(deltaY);
 				var state = deltaY > this.options.down.height ? STATE_AFTERCHANGEOFFSET : STATE_BEFORECHANGEOFFSET;
-				if (this.state !== state) {
+				if(this.state !== state) {
 					this.state = state;
-					if (this.state === STATE_AFTERCHANGEOFFSET) {
+					if(this.state === STATE_AFTERCHANGEOFFSET) {
 						this.removing = false;
 						this.isNeedRefresh = true;
 					} else {
@@ -8133,9 +8133,9 @@ Function.prototype.bind = Function.prototype.bind || function(to) {
 					}
 					this['_' + state](deltaY);
 				}
-				if ($.os.ios && parseFloat($.os.version) >= 8) {
+				if($.os.ios && parseFloat($.os.version) >= 8) {
 					var clientY = detail.gesture.touches[0].clientY;
-					if ((clientY + 10) > window.innerHeight || clientY < 10) {
+					if((clientY + 10) > window.innerHeight || clientY < 10) {
 						this._dragend(e);
 						return;
 					}
@@ -8144,12 +8144,12 @@ Function.prototype.bind = Function.prototype.bind || function(to) {
 		},
 		_dragend: function(e) {
 			var self = this;
-			if (self.isDragging) {
+			if(self.isDragging) {
 				self.isDragging = false;
 				self._dragEndAfterChangeOffset(self.isNeedRefresh);
 			}
-			if (self.isPullingUp) {
-				if (self.pullingUpTimeout) {
+			if(self.isPullingUp) {
+				if(self.pullingUpTimeout) {
 					clearTimeout(self.pullingUpTimeout);
 				}
 				self.pullingUpTimeout = setTimeout(function() {
@@ -8193,12 +8193,12 @@ Function.prototype.bind = Function.prototype.bind || function(to) {
 			});
 		},
 		removePullDownTips: function() {
-			if (this.pullDownTips) {
+			if(this.pullDownTips) {
 				try {
 					this.pullDownTips.parentNode && this.pullDownTips.parentNode.removeChild(this.pullDownTips);
 					this.pullDownTips = null;
 					this.removing = false;
-				} catch (e) {}
+				} catch(e) {}
 			}
 		},
 		pullStart: function(startDeltaY) {
@@ -8214,7 +8214,7 @@ Function.prototype.bind = Function.prototype.bind || function(to) {
 			this.pullDownTipsIcon.className = CLASS_PULL_TOP_ARROW_REVERSE;
 		},
 		dragEndAfterChangeOffset: function(isNeedRefresh) {
-			if (isNeedRefresh) {
+			if(isNeedRefresh) {
 				this.pullDownTipsIcon.className = CLASS_PULL_TOP_SPINNER;
 				this.pullDownLoading();
 			} else {
@@ -8223,10 +8223,10 @@ Function.prototype.bind = Function.prototype.bind || function(to) {
 			}
 		},
 		pullDownLoading: function() {
-			if (this.loading) {
+			if(this.loading) {
 				return;
 			}
-			if (!this.pullDownTips) {
+			if(!this.pullDownTips) {
 				this.initPullDownTips();
 				this.dragEndAfterChangeOffset(true);
 				return;
@@ -8237,7 +8237,7 @@ Function.prototype.bind = Function.prototype.bind || function(to) {
 			this.options.down.callback.apply(this);
 		},
 		pullUpLoading: function(e) {
-			if (this.loading || this.finished) {
+			if(this.loading || this.finished) {
 				return;
 			}
 			this.loading = true;
@@ -8252,18 +8252,18 @@ Function.prototype.bind = Function.prototype.bind || function(to) {
 			this.pullUpTips && this.pullUpTips.classList.remove(CLASS_HIDDEN);
 			this.pullDownTips.classList.add(CLASS_TRANSITIONING);
 			this.pullDownTips.style.webkitTransform = 'translate3d(0,0,0)';
-			if (this.deltaY <= 0) {
+			if(this.deltaY <= 0) {
 				this.removePullDownTips();
 			} else {
 				this.removing = true;
 			}
-			
-			if (this.isInScroll) {
+
+			if(this.isInScroll) {
 				$(this.element.parentNode).scroll().refresh();
 			}
 		},
 		endPullUpToRefresh: function(finished) {
-			if (finished) {
+			if(finished) {
 				this.finished = true;
 				this.pullUpTipsIcon.innerHTML = this.options.up.contentnomore;
 				this.element.removeEventListener('dragup', this);
@@ -8272,19 +8272,19 @@ Function.prototype.bind = Function.prototype.bind || function(to) {
 				this.pullUpTipsIcon.innerHTML = this.options.up.contentdown;
 			}
 			this.loading = false;
-//			console.log(this.isInScroll)
-			if (this.isInScroll) {
+			//			console.log(this.isInScroll)
+			if(this.isInScroll) {
 				//$(this.element.parentNode).scroll().refresh();
 			}
 		},
 		setStopped: function(stopped) {
-			if (stopped != this.stopped) {
+			if(stopped != this.stopped) {
 				this.stopped = stopped;
 				this.pullUpTips && this.pullUpTips.classList[stopped ? 'add' : 'remove'](CLASS_HIDDEN);
 			}
 		},
 		refresh: function(isReset) {
-			if (isReset && this.finished && this.pullUpTipsIcon) {
+			if(isReset && this.finished && this.pullUpTipsIcon) {
 				this.pullUpTipsIcon.innerHTML = this.options.up.contentdown;
 				this.element.addEventListener('dragup', this);
 				window.addEventListener('scroll', this);
@@ -8299,14 +8299,14 @@ Function.prototype.bind = Function.prototype.bind || function(to) {
 			var self = this;
 			var pullRefreshApi = null;
 			var id = self.getAttribute('data-pullToRefresh');
-			if (!id) {
+			if(!id) {
 				id = ++$.uuid;
 				$.data[id] = pullRefreshApi = new $.PullToRefresh(self, options);
 				self.setAttribute('data-pullToRefresh', id);
 			} else {
 				pullRefreshApi = $.data[id];
 			}
-			if (options.up && options.up.auto) { //如果设置了auto，则自动上拉一次
+			if(options.up && options.up.auto) { //如果设置了auto，则自动上拉一次
 				pullRefreshApi.pullUpLoading();
 			}
 			pullRefreshApis.push(pullRefreshApi);
@@ -8377,14 +8377,14 @@ Function.prototype.bind = Function.prototype.bind || function(to) {
 		self.beginAngle = 0;
 		self.beginExceed = self.beginAngle - MAX_EXCEED;
 		self.list.angle = self.beginAngle;
-		if (isIos) {
+		if(isIos) {
 			self.list.style.webkitTransformOrigin = "center center " + self.r + "px";
 		}
 	};
 
 	Picker.prototype.calcElementItemPostion = function(andGenerateItms) {
 		var self = this;
-		if (andGenerateItms) {
+		if(andGenerateItms) {
 			self.items = [];
 		}
 		self.elementItems.forEach(function(item) {
@@ -8393,7 +8393,7 @@ Function.prototype.bind = Function.prototype.bind || function(to) {
 			item.angle = self.endAngle;
 			item.style.webkitTransformOrigin = "center center -" + self.r + "px";
 			item.style.webkitTransform = "translateZ(" + self.r + "px) rotateX(" + (-self.endAngle) + "deg)";
-			if (andGenerateItms) {
+			if(andGenerateItms) {
 				var dataItem = {};
 				dataItem.text = item.innerHTML || '';
 				dataItem.value = item.getAttribute('data-value') || dataItem.text;
@@ -8421,9 +8421,9 @@ Function.prototype.bind = Function.prototype.bind || function(to) {
 		var self = this;
 		self.elementItems.forEach(function(item) {
 			var difference = Math.abs(item.angle - angle);
-			if (difference < self.hightlightRange) {
+			if(difference < self.hightlightRange) {
 				item.classList.add('highlight');
-			} else if (difference < self.visibleRange) {
+			} else if(difference < self.visibleRange) {
 				item.classList.add('visible');
 				item.classList.remove('highlight');
 			} else {
@@ -8464,7 +8464,7 @@ Function.prototype.bind = Function.prototype.bind || function(to) {
 			self.startInertiaScroll(event);
 		}, false);
 		self.holder.addEventListener($.EVENT_MOVE, function(event) {
-			if (!isPicking) {
+			if(!isPicking) {
 				return;
 			}
 			event.preventDefault();
@@ -8472,10 +8472,10 @@ Function.prototype.bind = Function.prototype.bind || function(to) {
 			var dragRange = endY - startY;
 			var dragAngle = self.calcAngle(dragRange);
 			var newAngle = dragRange > 0 ? lastAngle - dragAngle : lastAngle + dragAngle;
-			if (newAngle > self.endExceed) {
+			if(newAngle > self.endExceed) {
 				newAngle = self.endExceed
 			}
-			if (newAngle < self.beginExceed) {
+			if(newAngle < self.beginExceed) {
 				newAngle = self.beginExceed
 			}
 			self.setAngle(newAngle);
@@ -8484,7 +8484,7 @@ Function.prototype.bind = Function.prototype.bind || function(to) {
 		//--
 		self.list.addEventListener('tap', function(event) {
 			elementItem = event.target;
-			if (elementItem.tagName == 'LI') {
+			if(elementItem.tagName == 'LI') {
 				self.setSelectedIndex(self.elementItems.indexOf(elementItem), 200);
 			}
 		}, false);
@@ -8500,13 +8500,13 @@ Function.prototype.bind = Function.prototype.bind || function(to) {
 	Picker.prototype.updateInertiaParams = function(event, isStart) {
 		var self = this;
 		var point = event.changedTouches ? event.changedTouches[0] : event;
-		if (isStart) {
+		if(isStart) {
 			self.lastMoveStart = point.pageY;
 			self.lastMoveTime = event.timeStamp || Date.now();
 			self.startAngle = self.list.angle;
 		} else {
 			var nowTime = event.timeStamp || Date.now();
-			if (nowTime - self.lastMoveTime > 300) {
+			if(nowTime - self.lastMoveTime > 300) {
 				self.lastMoveTime = nowTime;
 				self.lastMoveStart = point.pageY;
 			}
@@ -8530,16 +8530,16 @@ Function.prototype.bind = Function.prototype.bind || function(to) {
 		var distAngle = self.calcAngle(dist) * dir;
 		//----
 		var srcDistAngle = distAngle;
-		if (startAngle + distAngle < self.beginExceed) {
+		if(startAngle + distAngle < self.beginExceed) {
 			distAngle = self.beginExceed - startAngle;
 			duration = duration * (distAngle / srcDistAngle) * 0.6;
 		}
-		if (startAngle + distAngle > self.endExceed) {
+		if(startAngle + distAngle > self.endExceed) {
 			distAngle = self.endExceed - startAngle;
 			duration = duration * (distAngle / srcDistAngle) * 0.6;
 		}
 		//----
-		if (distAngle == 0) {
+		if(distAngle == 0) {
 			self.endScroll();
 			return;
 		}
@@ -8554,11 +8554,11 @@ Function.prototype.bind = Function.prototype.bind || function(to) {
 			var stepCount = duration / frameInterval;
 			var stepIndex = 0;
 			(function inertiaMove() {
-				if (self.stopInertiaMove) return;
+				if(self.stopInertiaMove) return;
 				var newAngle = self.quartEaseOut(stepIndex, startAngle, distAngle, stepCount);
 				self.setAngle(newAngle);
 				stepIndex++;
-				if (stepIndex > stepCount - 1 || newAngle < self.beginExceed || newAngle > self.endExceed) {
+				if(stepIndex > stepCount - 1 || newAngle < self.beginExceed || newAngle > self.endExceed) {
 					self.endScroll();
 					return;
 				}
@@ -8573,10 +8573,10 @@ Function.prototype.bind = Function.prototype.bind || function(to) {
 
 	Picker.prototype.endScroll = function() {
 		var self = this;
-		if (self.list.angle < self.beginAngle) {
+		if(self.list.angle < self.beginAngle) {
 			self.list.style.webkitTransition = "150ms ease-out";
 			self.setAngle(self.beginAngle);
-		} else if (self.list.angle > self.endAngle) {
+		} else if(self.list.angle > self.endAngle) {
 			self.list.style.webkitTransition = "150ms ease-out";
 			self.setAngle(self.endAngle);
 		} else {
@@ -8592,7 +8592,7 @@ Function.prototype.bind = Function.prototype.bind || function(to) {
 		setTimeout(function() {
 			var index = self.getSelectedIndex();
 			var item = self.items[index];
-			if ($.trigger && (index != self.lastIndex || force === true)) {
+			if($.trigger && (index != self.lastIndex || force === true)) {
 				$.trigger(self.holder, 'change', {
 					"index": index,
 					"item": item
@@ -8606,9 +8606,9 @@ Function.prototype.bind = Function.prototype.bind || function(to) {
 
 	Picker.prototype.correctAngle = function(angle) {
 		var self = this;
-		if (angle < self.beginAngle) {
+		if(angle < self.beginAngle) {
 			return self.beginAngle;
-		} else if (angle > self.endAngle) {
+		} else if(angle > self.endAngle) {
 			return self.endAngle;
 		} else {
 			return angle;
@@ -8620,7 +8620,7 @@ Function.prototype.bind = Function.prototype.bind || function(to) {
 		self.items = items || [];
 		var buffer = [];
 		self.items.forEach(function(item) {
-			if (item !== null && item !== undefined) {
+			if(item !== null && item !== undefined) {
 				buffer.push('<li>' + (item.text || item) + '</li>');
 			}
 		});
@@ -8645,7 +8645,7 @@ Function.prototype.bind = Function.prototype.bind || function(to) {
 		var self = this;
 		self.list.style.webkitTransition = '';
 		var angle = self.correctAngle(self.itemAngle * index);
-		if (duration && duration > 0) {
+		if(duration && duration > 0) {
 			var distAngle = angle - self.list.angle;
 			self.scrollDistAngle(Date.now(), self.list.angle, distAngle, duration);
 		} else {
@@ -8661,31 +8661,31 @@ Function.prototype.bind = Function.prototype.bind || function(to) {
 
 	Picker.prototype.getSelectedValue = function() {
 		var self = this;
-		return (self.items[self.getSelectedIndex()] || {}).value;
+		return(self.items[self.getSelectedIndex()] || {}).value;
 	};
 
 	Picker.prototype.getSelectedText = function() {
 		var self = this;
-		return (self.items[self.getSelectedIndex()] || {}).text;
+		return(self.items[self.getSelectedIndex()] || {}).text;
 	};
 
 	Picker.prototype.setSelectedValue = function(value, duration, callback) {
 		var self = this;
-		for (var index in self.items) {
+		for(var index in self.items) {
 			var item = self.items[index];
-			if (item.value == value) {
+			if(item.value == value) {
 				self.setSelectedIndex(index, duration, callback);
 				return;
 			}
 		}
 	};
 
-	if ($.fn) {
+	if($.fn) {
 		$.fn.picker = function(options) {
 			//遍历选择的元素
 			this.each(function(i, element) {
-				if (element.picker) return;
-				if (options) {
+				if(element.picker) return;
+				if(options) {
 					element.picker = new Picker(element, options);
 				} else {
 					var optionsText = element.getAttribute('data-picker-options');
@@ -8716,14 +8716,14 @@ Function.prototype.bind = Function.prototype.bind || function(to) {
 
 	//创建 DOM
 	$.dom = function(str) {
-		if (typeof(str) !== 'string') {
-			if ((str instanceof Array) || (str[0] && str.length)) {
+		if(typeof(str) !== 'string') {
+			if((str instanceof Array) || (str[0] && str.length)) {
 				return [].slice.call(str);
 			} else {
 				return [str];
 			}
 		}
-		if (!$.__create_dom_div__) {
+		if(!$.__create_dom_div__) {
 			$.__create_dom_div__ = document.createElement('div');
 		}
 		$.__create_dom_div__.innerHTML = str;
@@ -8768,9 +8768,9 @@ Function.prototype.bind = Function.prototype.bind || function(to) {
 				self.hide();
 			}, false);
 			self.ok.addEventListener('tap', function(event) {
-				if (self.callback) {
+				if(self.callback) {
 					var rs = self.callback(self.getSelectedItems());
-					if (rs !== false) {
+					if(rs !== false) {
 						self.hide();
 					}
 				}
@@ -8792,7 +8792,7 @@ Function.prototype.bind = Function.prototype.bind || function(to) {
 			var layer = self.options.layer || 1;
 			var width = (100 / layer) + '%';
 			self.pickers = [];
-			for (var i = 1; i <= layer; i++) {
+			for(var i = 1; i <= layer; i++) {
 				var pickerElement = $.dom(pickerBuffer)[0];
 				pickerElement.style.width = width;
 				self.body.appendChild(pickerElement);
@@ -8800,7 +8800,7 @@ Function.prototype.bind = Function.prototype.bind || function(to) {
 				self.pickers.push(picker);
 				pickerElement.addEventListener('change', function(event) {
 					var nextPickerElement = this.nextSibling;
-					if (nextPickerElement && nextPickerElement.picker) {
+					if(nextPickerElement && nextPickerElement.picker) {
 						var eventData = event.detail || {};
 						var preItem = eventData.item || {};
 						nextPickerElement.picker.setItems(preItem.children);
@@ -8818,7 +8818,7 @@ Function.prototype.bind = Function.prototype.bind || function(to) {
 		getSelectedItems: function() {
 			var self = this;
 			var items = [];
-			for (var i in self.pickers) {
+			for(var i in self.pickers) {
 				var picker = self.pickers[i];
 				items.push(picker.getSelectedItem() || {});
 			}
@@ -8840,19 +8840,19 @@ Function.prototype.bind = Function.prototype.bind || function(to) {
 		//隐藏
 		hide: function() {
 			var self = this;
-			if (self.disposed) return;
+			if(self.disposed) return;
 			self.panel.classList.remove($.className('active'));
 			self.mask.close();
 			document.body.classList.remove($.className('poppicker-active-for-page'));
 			//处理物理返回键
-			$.back=self.__back;
+			$.back = self.__back;
 		},
 		dispose: function() {
 			var self = this;
 			self.hide();
 			setTimeout(function() {
 				self.panel.parentNode.removeChild(self.panel);
-				for (var name in self) {
+				for(var name in self) {
 					self[name] = null;
 					delete self[name];
 				};
@@ -8874,14 +8874,14 @@ Function.prototype.bind = Function.prototype.bind || function(to) {
 
 	//创建 DOM
 	$.dom = function(str) {
-		if (typeof(str) !== 'string') {
-			if ((str instanceof Array) || (str[0] && str.length)) {
+		if(typeof(str) !== 'string') {
+			if((str instanceof Array) || (str[0] && str.length)) {
 				return [].slice.call(str);
 			} else {
 				return [str];
 			}
 		}
-		if (!$.__create_dom_div__) {
+		if(!$.__create_dom_div__) {
 			$.__create_dom_div__ = document.createElement('div');
 		}
 		$.__create_dom_div__.innerHTML = str;
@@ -8962,12 +8962,12 @@ Function.prototype.bind = Function.prototype.bind || function(to) {
 			}, false);
 			ui.ok.addEventListener('tap', function() {
 				var rs = self.callback(self.getSelected());
-				if (rs !== false) {
+				if(rs !== false) {
 					self.hide();
 				}
 			}, false);
 			ui.y.addEventListener('change', function(e) { //目前的change事件容易导致级联触发
-				if (self.options.beginMonth || self.options.endMonth) {
+				if(self.options.beginMonth || self.options.endMonth) {
 					self._createMonth();
 				} else {
 					self._createDay();
@@ -8977,12 +8977,12 @@ Function.prototype.bind = Function.prototype.bind || function(to) {
 				self._createDay();
 			}, false);
 			ui.d.addEventListener('change', function(e) {
-				if (self.options.beginMonth || self.options.endMonth) { //仅提供了beginDate时，触发day,hours,minutes的change
+				if(self.options.beginMonth || self.options.endMonth) { //仅提供了beginDate时，触发day,hours,minutes的change
 					self._createHours();
 				}
 			}, false);
 			ui.h.addEventListener('change', function(e) {
-				if (self.options.beginMonth || self.options.endMonth) {
+				if(self.options.beginMonth || self.options.endMonth) {
 					self._createMinutes();
 				}
 			}, false);
@@ -9013,7 +9013,7 @@ Function.prototype.bind = Function.prototype.bind || function(to) {
 					return this.value;
 				}
 			};
-			switch (type) {
+			switch(type) {
 				case 'datetime':
 					selected.value = selected.y.value + '-' + selected.m.value + '-' + selected.d.value + ' ' + selected.h.value + ':' + selected.i.value;
 					selected.text = selected.y.text + '-' + selected.m.text + '-' + selected.d.text + ' ' + selected.h.text + ':' + selected.i.text;
@@ -9053,22 +9053,22 @@ Function.prototype.bind = Function.prototype.bind || function(to) {
 			});
 		},
 		isLeapYear: function(year) {
-			return (year % 4 == 0 && year % 100 != 0) || (year % 400 == 0);
+			return(year % 4 == 0 && year % 100 != 0) || (year % 400 == 0);
 		},
 		_inArray: function(array, item) {
-			for (var index in array) {
+			for(var index in array) {
 				var _item = array[index];
-				if (_item === item) return true;
+				if(_item === item) return true;
 			}
 			return false;
 		},
 		getDayNum: function(year, month) {
 			var self = this;
-			if (self._inArray([1, 3, 5, 7, 8, 10, 12], month)) {
+			if(self._inArray([1, 3, 5, 7, 8, 10, 12], month)) {
 				return 31;
-			} else if (self._inArray([4, 6, 9, 11], month)) {
+			} else if(self._inArray([4, 6, 9, 11], month)) {
 				return 30;
-			} else if (self.isLeapYear(year)) {
+			} else if(self.isLeapYear(year)) {
 				return 29;
 			} else {
 				return 28;
@@ -9076,7 +9076,7 @@ Function.prototype.bind = Function.prototype.bind || function(to) {
 		},
 		_fill: function(num) {
 			num = num.toString();
-			if (num.length < 2) {
+			if(num.length < 2) {
 				num = 0 + num;
 			}
 			return num;
@@ -9111,12 +9111,12 @@ Function.prototype.bind = Function.prototype.bind || function(to) {
 			var ui = self.ui;
 			//生成年列表
 			var yArray = [];
-			if (options.customData.y) {
+			if(options.customData.y) {
 				yArray = options.customData.y;
 			} else {
 				var yBegin = options.beginYear;
 				var yEnd = options.endYear;
-				for (var y = yBegin; y <= yEnd; y++) {
+				for(var y = yBegin; y <= yEnd; y++) {
 					yArray.push({
 						text: y + '',
 						value: y
@@ -9133,12 +9133,12 @@ Function.prototype.bind = Function.prototype.bind || function(to) {
 
 			//生成月列表
 			var mArray = [];
-			if (options.customData.m) {
+			if(options.customData.m) {
 				mArray = options.customData.m;
 			} else {
 				var m = options.beginMonth && self._isBeginYear() ? options.beginMonth : 1;
 				var maxMonth = options.endMonth && self._isEndYear() ? options.endMonth : 12;
-				for (; m <= maxMonth; m++) {
+				for(; m <= maxMonth; m++) {
 					var val = self._fill(m);
 					mArray.push({
 						text: val,
@@ -9156,12 +9156,12 @@ Function.prototype.bind = Function.prototype.bind || function(to) {
 
 			//生成日列表
 			var dArray = [];
-			if (options.customData.d) {
+			if(options.customData.d) {
 				dArray = options.customData.d;
 			} else {
 				var d = self._isBeginMonth() ? options.beginDay : 1;
 				var maxDay = self._isEndMonth() ? options.endDay : self.getDayNum(parseInt(this.ui.y.picker.getSelectedValue()), parseInt(this.ui.m.picker.getSelectedValue()));
-				for (; d <= maxDay; d++) {
+				for(; d <= maxDay; d++) {
 					var val = self._fill(d);
 					dArray.push({
 						text: val,
@@ -9179,12 +9179,12 @@ Function.prototype.bind = Function.prototype.bind || function(to) {
 			var ui = self.ui;
 			//生成时列表
 			var hArray = [];
-			if (options.customData.h) {
+			if(options.customData.h) {
 				hArray = options.customData.h;
 			} else {
 				var h = self._isBeginDay() ? options.beginHours : 0;
 				var maxHours = self._isEndDay() ? options.endHours : 23;
-				for (; h <= maxHours; h++) {
+				for(; h <= maxHours; h++) {
 					var val = self._fill(h);
 					hArray.push({
 						text: val,
@@ -9202,12 +9202,12 @@ Function.prototype.bind = Function.prototype.bind || function(to) {
 
 			//生成分列表
 			var iArray = [];
-			if (options.customData.i) {
+			if(options.customData.i) {
 				iArray = options.customData.i;
 			} else {
 				var i = self._isBeginHours() ? options.beginMinutes : 0;
 				var maxMinutes = self._isEndHours() ? options.endMinutes : 59;
-				for (; i <= maxMinutes; i++) {
+				for(; i <= maxMinutes; i++) {
 					var val = self._fill(i);
 					iArray.push({
 						text: val,
@@ -9236,7 +9236,7 @@ Function.prototype.bind = Function.prototype.bind || function(to) {
 		_parseValue: function(value) {
 			var self = this;
 			var rs = {};
-			if (value) {
+			if(value) {
 				var parts = value.replace(":", "-").replace(" ", "-").split("-");
 				rs.y = parts[0];
 				rs.m = parts[1];
@@ -9263,7 +9263,7 @@ Function.prototype.bind = Function.prototype.bind || function(to) {
 			self.options = options;
 			var now = new Date();
 			var beginDate = options.beginDate;
-			if (beginDate instanceof Date && !isNaN(beginDate.valueOf())) { //设定了开始日期
+			if(beginDate instanceof Date && !isNaN(beginDate.valueOf())) { //设定了开始日期
 				options.beginYear = beginDate.getFullYear();
 				options.beginMonth = beginDate.getMonth() + 1;
 				options.beginDay = beginDate.getDate();
@@ -9271,7 +9271,7 @@ Function.prototype.bind = Function.prototype.bind || function(to) {
 				options.beginMinutes = beginDate.getMinutes();
 			}
 			var endDate = options.endDate;
-			if (endDate instanceof Date && !isNaN(endDate.valueOf())) { //设定了结束日期
+			if(endDate instanceof Date && !isNaN(endDate.valueOf())) { //设定了结束日期
 				options.endYear = endDate.getFullYear();
 				options.endMonth = endDate.getMonth() + 1;
 				options.endDay = endDate.getDate();
@@ -9311,7 +9311,7 @@ Function.prototype.bind = Function.prototype.bind || function(to) {
 		},
 		hide: function() {
 			var self = this;
-			if (self.disposed) return;
+			if(self.disposed) return;
 			var ui = self.ui;
 			ui.picker.classList.remove($.className('active'));
 			ui.mask.close();
@@ -9324,7 +9324,7 @@ Function.prototype.bind = Function.prototype.bind || function(to) {
 			self.hide();
 			setTimeout(function() {
 				self.ui.picker.parentNode.removeChild(self.ui.picker);
-				for (var name in self) {
+				for(var name in self) {
 					self[name] = null;
 					delete self[name];
 				};

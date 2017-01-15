@@ -8839,24 +8839,31 @@ Function.prototype.bind = Function.prototype.bind || function(to) {
 		},
 		//隐藏
 		hide: function() {
+			
 			var self = this;
-			if(self.disposed) return;
+			
 			self.panel.classList.remove($.className('active'));
 			self.mask.close();
 			document.body.classList.remove($.className('poppicker-active-for-page'));
 			//处理物理返回键
 			$.back = self.__back;
+			self.hided=true;
+			if(self.disposed) return;
+			if(self.options.autoDispose){
+				self.dispose();
+			}
 		},
 		dispose: function() {
 			var self = this;
-			self.hide();
+			self.disposed = true;
+			!self.hided&&(self.hide());
 			setTimeout(function() {
 				self.panel.parentNode.removeChild(self.panel);
 				for(var name in self) {
 					self[name] = null;
 					delete self[name];
 				};
-				self.disposed = true;
+				
 			}, 300);
 		}
 	});

@@ -3,6 +3,15 @@ function($) {
 	document.addEventListener("touchmove", function(e) { //disable wechat default scroll
 		e.preventDefault();
 	}, false);
+	DOMTokenList.prototype.adds = function(tokens) {
+		if(!tokens) {
+			return;
+		}
+		tokens.split(" ").forEach(function(token) {
+			token && this.add(token);
+		}.bind(this));
+		return this;
+	};
 	Date.prototype.pattern = function(fmt) {
 		var o = {
 			"M+": this.getMonth() + 1, //月份
@@ -167,7 +176,6 @@ function($) {
 			e.initCustomEvent(type, config.bubbles, config.cancelable, config.detail);
 			return e;
 		};
-
 		window.CustomEvent.prototype = window.Event.prototype;
 	}
 
@@ -185,12 +193,10 @@ function($) {
 	};
 
 	var Util = {
-
 		getUrlFragment: function(url) {
 			var hashIndex = url.indexOf('#');
 			return hashIndex === -1 ? '' : url.slice(hashIndex + 1);
 		},
-
 		getAbsoluteUrl: function(url) {
 			var link = document.createElement('a');
 			link.setAttribute('href', url);
@@ -198,17 +204,14 @@ function($) {
 			link = null;
 			return absoluteUrl;
 		},
-
 		getBaseUrl: function(url) {
 			var hashIndex = url.indexOf('#');
 			return hashIndex === -1 ? url.slice(0) : url.slice(0, hashIndex);
 		},
-
 		toUrlObject: function(url) {
 			var fullUrl = this.getAbsoluteUrl(url),
 				baseUrl = this.getBaseUrl(fullUrl),
 				fragment = this.getUrlFragment(url);
-
 			return {
 				base: baseUrl,
 				full: fullUrl,
@@ -216,7 +219,6 @@ function($) {
 				fragment: fragment
 			};
 		},
-
 		supportStorage: function() {
 			var mod = 'chakra.router.storage.ability';
 			try {
@@ -248,7 +250,6 @@ function($) {
 			currentState: 'chakra.router.currentState',
 			maxStateId: 'chakra.router.maxStateId'
 		};
-
 		this._init();
 		this.xhr = null;
 		window.addEventListener('popstate', this._onPopState.bind(this));
@@ -266,7 +267,6 @@ function($) {
 		var $visibleSection = $doc.find('.' + routerConfig.curPageClass);
 		var $curVisibleSection = $visibleSection.eq(0);
 		var $hashSection;
-
 		if(currentUrlObj.fragment) {
 			$hashSection = $doc.find('#' + currentUrlObj.fragment);
 		}
@@ -278,7 +278,6 @@ function($) {
 		if(!$visibleSection.attr('id')) {
 			$visibleSection.attr('id', this._generateRandomId());
 		}
-
 		if($curVisibleSection.length &&
 			($curVisibleSection.attr('id') !== $visibleSection.attr('id'))) {
 			$curVisibleSection.removeClass(routerConfig.curPageClass);
@@ -287,7 +286,6 @@ function($) {
 			$visibleSection.addClass(routerConfig.curPageClass);
 		}
 		curPageId = $visibleSection.attr('id');
-
 		if(theHistory.state === null) {
 			var curState = {
 				id: this._getNextStateId(),
@@ -301,12 +299,15 @@ function($) {
 		}
 	};
 
-	Router.prototype.load = function(url, ignoreCache) {
+	Router.prototype.load = function(url, param, ignoreCache, isPushState) {
 		if(ignoreCache === undefined) {
 			ignoreCache = false;
 		}
+		if(url == location.href && !ignoreCache) {
+			return;
+		}
 		this._saveDocumentIntoCache($(document), location.href);
-		this._switchToDocument(url, ignoreCache);
+		this._switchToDocument(url, ignoreCache, isPushState, null, param);
 	};
 
 	Router.prototype.forward = function() {
@@ -319,7 +320,7 @@ function($) {
 
 	Router.prototype.loadPage = Router.prototype.load;
 
-	Router.prototype._switchToDocument = function(url, ignoreCache, isPushState, direction) {
+	Router.prototype._switchToDocument = function(url, ignoreCache, isPushState, direction, param) {
 		var baseUrl = Util.toUrlObject(url).base;
 		if(ignoreCache) {
 			delete this.cache[baseUrl];
@@ -329,27 +330,29 @@ function($) {
 		var context = this;
 		if(cacheDocument) {
 			setTimeout(function() {
-				context._doSwitchDocument(url, isPushState, direction);
+				context._doSwitchDocument(url, isPushState, direction, param);
 			}, 50)
 		} else {
 			this._loadDocument(url, {
 				success: function($doc) {
 					try {
 						context._parseDocument(url, $doc);
-						context._doSwitchDocument(url, isPushState, direction);
+						context._doSwitchDocument(url, isPushState, direction, param);
 					} catch(e) {
-						location.href = url;
+						console.error(e);
+						//location.href = url;
 					}
 				},
-				error: function() {
-					location.href = url;
+				error: function(e) {
+					console.error(e);
+					//location.href = url;
 				}
 			});
 		}
 
 	};
 
-	Router.prototype._doSwitchDocument = function(url, isPushState, direction) {
+	Router.prototype._doSwitchDocument = function(url, isPushState, direction, param) {
 		if(typeof isPushState === 'undefined') {
 			isPushState = true;
 		}
@@ -371,7 +374,7 @@ function($) {
 		if(!$visibleSection.attr('id')) {
 			$visibleSection.attr('id', this._generateRandomId());
 		}
-
+		$.setSessionStorage($visibleSection.attr('id'), param);
 		var $currentSection = this._getCurrentSection();
 		$currentSection.trigger(EVENTS.beforePageSwitch, [$currentSection.attr('id'), $currentSection]);
 
@@ -445,7 +448,9 @@ function($) {
 
 	Router.prototype._extendHTML = function($doc) {
 		var extend = $doc.find("extend");
-		var that = this;
+		if(extend.length === 0) {
+			return;
+		}
 		extend.forEach(function(e) {
 			var $e = $(e);
 			var ext = {};
@@ -461,20 +466,25 @@ function($) {
 					url: src,
 					async: false,
 					success: function(html) {
-						var binds = html.match(/\{\$([^\{\{]+)\}/g);
-						console.log(binds)
-						binds.forEach(function(b) {
-							var _b = b.replace("{", "").replace("}", "");
-							var content = ext.data[_b] || "";
+						var binds = html.match(/\{\$[\S]*?\}/g);
+						binds && (binds.forEach(function(b) {
+							var _b = b.replace("{", "").replace("}", "").replace("$", "");
+							var content = ext.data;
+							_b.split(".").forEach(function(__b) {
+								content = content[__b]
+							})
+							if(typeof content === "object") {
+								content = JSON.stringify(content);
+							}
 							html = html.replace(b, content);
-						})
+						}))
 						$e.before(html);
 						$e.remove();
-						that._extendHTML($doc)
 					}
 				});
 			}
 		})
+		this._extendHTML($doc)
 	}
 
 	Router.prototype._getLastState = function() {
@@ -521,20 +531,6 @@ function($) {
 		$to.animationEnd(function() {
 			$visibleSection.trigger(EVENTS.pageAnimationEnd, [sectionId, $visibleSection]);
 			$visibleSection.trigger(EVENTS.pageInit, [sectionId, $visibleSection]);
-		});
-	};
-
-	Router.prototype._animateSection = function($from, $to, direction) {
-		var toId = $to.attr('id');
-		$from.trigger(EVENTS.beforePageSwitch, [$from.attr('id'), $from]);
-
-		$from.removeClass(routerConfig.curPageClass);
-		$to.addClass(routerConfig.curPageClass);
-		$to.trigger(EVENTS.pageAnimationStart, [toId, $to]);
-		this._animateElement($from, $to, direction);
-		$to.animationEnd(function() {
-			$to.trigger(EVENTS.pageAnimationEnd, [toId, $to]);
-			$to.trigger(EVENTS.pageInit, [toId, $to]);
 		});
 	};
 
@@ -724,12 +720,12 @@ function($) {
 			if($target.hasClass('back')) {
 				router.back();
 			} else {
-				var url = $target.attr('href');
+				var url = e.currentTarget.href;
 				if(!url || url === '#') {
 					return;
 				}
 				var ignoreCache = $target.attr('data-no-cache') === 'true';
-				$.router.load(url, ignoreCache);
+				$.router.load(url, null, ignoreCache);
 			}
 		});
 	});
@@ -741,7 +737,12 @@ function($) {
 		if(!$page[0]) $page = $(".page").addClass('page-current');
 		return $page;
 	};
-
+	$.getSessionStorage = function(key) {
+		return JSON.parse(sessionStorage.getItem(key));
+	}
+	$.setSessionStorage = function(key, value) {
+		value && (sessionStorage.setItem(key, JSON.stringify(value)));
+	}
 	$(window).on('pageLoadStart', function() {
 		$.showIndicator();
 	});
@@ -751,9 +752,9 @@ function($) {
 	$(window).on('pageLoadCancel', function() {
 		$.hideIndicator();
 	});
-	//		$(window).on('pageLoadComplete', function() {
-	//			$.hideIndicator();
-	//		});
+	$(window).on('pageLoadComplete', function() {
+		$.hideIndicator();
+	});
 	$(window).on('pageLoadError', function() {
 		$.hideIndicator();
 		mui.toast('加载失败');
@@ -795,8 +796,59 @@ function($) {
 
 	$.init = function() {
 		$.showIndicator();
+		$.data = {};
 		var $page = getPage();
 		var id = $page[0].id;
-		$page.trigger('pageInit', [id, $page]);
+		$.doAjax("data/userInfo.json", {
+			code: $.getQueryString("CODE")
+		}, function(d) {
+			$page.trigger('pageInit', [id, $page]);
+			$.data.userInfo = d;
+			$.router.load(location.href, null, true, false);
+		})
+
 	};
-}(Zepto);
+}(Zepto); +
+
+function($) {
+	var settings;
+
+	function getSettings() {
+		$.ajax({
+			type: "get",
+			url: "data/settings.json",
+			async: false,
+			success: function(d) {
+				settings = d;
+			}
+		});
+	}
+	$.doAjax = function(url, data, callback, err, type) {
+		!type && (type = "get");
+		Zepto.showIndicator();
+		!settings && (getSettings());
+		$.data.token && (data.token = $.data.token);
+		$.ajax({
+			type: type,
+			url: settings.server + url,
+			data: data,
+			async: true,
+			success: function(d) {
+				$.hideIndicator();
+				if(d.code != 0) {
+					mui.toast(d.message);
+					err && err();
+				} else {
+					d.token && ($.data.token = d.token);
+					callback && callback(d.data);
+				}
+
+			},
+			error: function(e) {
+				console.error(e);
+				mui.toast("系统出错，请稍后再试")
+				$.hideIndicator();
+			}
+		});
+	};
+}(Zepto)

@@ -1,0 +1,8 @@
+.page-group{
+	top: 44px;
+	bottom: 0;
+	height: auto;
+}
+.mui-content>.mui-table-view:first-child{
+	margin-top: 5px;
+}

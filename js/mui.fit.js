@@ -4906,26 +4906,13 @@ Function.prototype.bind = Function.prototype.bind || function(to) {
 					sliderElement.setAttribute('data-slider', id);
 				} else {
 					slider = $.data[id];
-					if(slider && options) {
-						slider.refresh(options);
-					}
+					$.data[id] = slider = new Slider(sliderElement, options);
 				}
 			}
 		});
 		return slider;
 	};
-	$.ready(function() {
-		//		setTimeout(function() {
-		$('.mui-slider').slider();
-		$('.mui-scroll-wrapper.mui-slider-indicator.mui-segmented-control').scroll({
-			scrollY: false,
-			scrollX: true,
-			indicators: false,
-			snap: '.mui-control-item'
-		});
-		//		}, 500); //临时处理slider宽度计算不正确的问题(初步确认是scrollbar导致的)
 
-	});
 })(mui, window);
 /**
  * pullRefresh 5+

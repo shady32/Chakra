@@ -220,7 +220,7 @@ function($) {
 			};
 		},
 		supportStorage: function() {
-			var mod = 'chakra.router.storage.ability';
+			var mod = 'kimkra.router.storage.ability';
 			try {
 				sessionStorage.setItem(mod, mod);
 				sessionStorage.removeItem(mod);
@@ -247,8 +247,8 @@ function($) {
 
 	var Router = function() {
 		this.sessionNames = {
-			currentState: 'chakra.router.currentState',
-			maxStateId: 'chakra.router.maxStateId'
+			currentState: 'kimkra.router.currentState',
+			maxStateId: 'kimkra.router.maxStateId'
 		};
 		this._init();
 		this.xhr = null;
